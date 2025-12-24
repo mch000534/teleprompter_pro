@@ -13,7 +13,12 @@ const State = {
     scrollPosition: 0,
     lastFrameTime: 0,
     guideHeight: 50,
-    fontFamily: "'Noto Sans TC', sans-serif"
+    fontFamily: "'Noto Sans TC', sans-serif",
+    // Interaction State
+    isImmersive: false, // Controls UI visibility (Full page vs Settings)
+    isDragging: false,
+    touchHasMoved: false,
+    lastTouchY: 0
 };
 
 // --- 2. DOM Elements ---
@@ -68,25 +73,30 @@ function updateUI() {
         Elements.scrollContent.style.width = `${100 - (State.margin * 2)}%`;
     }
 
-    // Sync Play/Pause Button
+    // Sync Play/Pause Button (In Control Panel)
     const icon = Elements.btnPlayPause.querySelector('.icon');
     const text = Elements.btnPlayPause.lastChild;
-    const container = document.querySelector('.app-container');
 
+    // Check Immersive State for container class
+    const container = document.querySelector('.app-container');
+    if (State.isImmersive) {
+        container.classList.add('is-playing');
+    } else {
+        container.classList.remove('is-playing');
+    }
+
+    // Button state reflects "Playing" status (scrolling or not)
+    // Note: When immersive, this button is hidden anyway, but good to keep sync.
     if (State.isPlaying) {
         icon.textContent = '⏸';
         text.textContent = ' 暫停';
         Elements.btnPlayPause.classList.remove('primary');
         Elements.btnPlayPause.classList.add('secondary');
-        // Immersive Mode ON
-        container.classList.add('is-playing');
     } else {
         icon.textContent = '▶';
         text.textContent = ' 播放';
         Elements.btnPlayPause.classList.add('primary');
         Elements.btnPlayPause.classList.remove('secondary');
-        // Immersive Mode OFF
-        container.classList.remove('is-playing');
     }
 
     // Sync Flip State
@@ -187,8 +197,8 @@ function initEvents() {
         });
     }
 
-    // Play/Pause Toggle
-    Elements.btnPlayPause.addEventListener('click', togglePlay);
+    // Play Button (Enters Immersive + Starts)
+    Elements.btnPlayPause.addEventListener('click', startImmersivePlayback);
 
     // Reset
     Elements.btnReset.addEventListener('click', resetScroll);
@@ -198,14 +208,18 @@ function initEvents() {
 
     // Exit Button
     if (Elements.btnExit) {
-        Elements.btnExit.addEventListener('click', () => {
-            resetScroll();
+        Elements.btnExit.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent triggering tap-to-pause on container
+            exitImmersive();
         });
     }
 
     // Fullscreen Button
     if (Elements.btnFullscreen) {
-        Elements.btnFullscreen.addEventListener('click', toggleFullscreen);
+        Elements.btnFullscreen.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFullscreen();
+        });
     }
 
     // Keyboard Shortcuts
@@ -216,7 +230,11 @@ function initEvents() {
         switch (e.code) {
             case 'Space':
                 e.preventDefault(); // Prevent page scroll
-                togglePlay();
+                if (State.isImmersive) {
+                    togglePause();
+                } else {
+                    startImmersivePlayback();
+                }
                 break;
             case 'ArrowUp':
                 e.preventDefault();
@@ -227,8 +245,7 @@ function initEvents() {
                 adjustScroll(50);
                 break;
             case 'Escape':
-                if (State.isPlaying) togglePlay();
-                // Also nice to exit fullscreen on ESC, but browser does that naturally
+                if (State.isImmersive) exitImmersive();
                 break;
         }
     });
@@ -240,19 +257,71 @@ function initEvents() {
             adjustScroll(e.deltaY);
         }
     });
+
+    // Touch Events for Manual Control during Playback
+    // Touch Events for Manual Control + Tap to Pause
+    Elements.displayArea.addEventListener('touchstart', (e) => {
+        if (State.isImmersive) {
+            State.isDragging = true;
+            State.touchHasMoved = false;
+            State.lastTouchY = e.touches[0].clientY;
+        }
+    }, { passive: false });
+
+    Elements.displayArea.addEventListener('touchmove', (e) => {
+        if (State.isImmersive && State.isDragging) {
+            State.touchHasMoved = true;
+            e.preventDefault(); // Prevent standard page scroll
+            const currentY = e.touches[0].clientY;
+            const deltaY = State.lastTouchY - currentY;
+            State.lastTouchY = currentY;
+            adjustScroll(deltaY);
+        }
+    }, { passive: false });
+
+    Elements.displayArea.addEventListener('touchend', (e) => {
+        State.isDragging = false;
+
+        // If not a drag (touchend without move), treat as Tap
+        if (!State.touchHasMoved && State.isImmersive) {
+            // Prevent phantom clicks if needed, though usually fine
+            togglePause();
+        }
+    });
+
+    Elements.displayArea.addEventListener('touchcancel', () => {
+        State.isDragging = false;
+    });
 }
 
 // --- 5. Core Logic ---
 
-function togglePlay() {
+function startImmersivePlayback() {
+    State.isImmersive = true;
+    State.isPlaying = true;
+
+    // Auto-enter fullscreen
+    if (!document.fullscreenElement) {
+        toggleFullscreen();
+    }
+
+    State.lastFrameTime = performance.now();
+    requestAnimationFrame(renderLoop);
+    updateUI();
+}
+
+function exitImmersive() {
+    State.isImmersive = false;
+    State.isPlaying = false;
+    resetScroll(); // Logic to reset position if desired, or just stop
+}
+
+function togglePause() {
+    if (!State.isImmersive) return;
+
     State.isPlaying = !State.isPlaying;
 
     if (State.isPlaying) {
-        // Auto-enter fullscreen on play if not already
-        if (!document.fullscreenElement) {
-            toggleFullscreen();
-        }
-
         State.lastFrameTime = performance.now();
         requestAnimationFrame(renderLoop);
     }
@@ -273,6 +342,11 @@ function toggleFullscreen() {
 
 function resetScroll() {
     State.isPlaying = false;
+    // Note: We don't necessarily exit immersive mode here if we just want to reset to top while playing?
+    // But typically reset is "Stop and Reset".
+    // If called from Exit button, isImmersive is handled by exitImmersive.
+    // If called from Reset button (panel), likely not immersive.
+
     State.scrollPosition = 0;
 
     // Auto-exit fullscreen when stopping
@@ -312,6 +386,12 @@ function adjustScroll(delta) {
 
 function renderLoop(timestamp) {
     if (!State.isPlaying) return;
+
+    // Skip auto-scroll if user is manually dragging
+    if (State.isDragging) {
+        requestAnimationFrame(renderLoop);
+        return;
+    }
 
     const rawSpeed = State.speed;
     let pixelsPerFrame = 0;
