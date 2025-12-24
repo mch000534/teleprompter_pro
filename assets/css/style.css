@@ -130,6 +130,17 @@ html {
     color: var(--accent-color);
 }
 
+.github-link {
+    color: var(--panel-text);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.github-link:hover {
+    color: var(--accent-color);
+}
+
 .panel-content {
     display: flex;
     gap: 2rem;
