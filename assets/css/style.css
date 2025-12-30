@@ -476,10 +476,6 @@ select {
     text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-.teleprompter-display.flipped .countdown-overlay {
-    transform: translate(-50%, -50%) scaleY(-1);
-}
-
 /* Immersive State (.is-playing on app-container) */
 .app-container.is-playing .control-panel {
     display: none;
