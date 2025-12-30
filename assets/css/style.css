@@ -118,7 +118,8 @@ html {
 
 .panel-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    /* Center horizontally */
     align-items: center;
     margin-bottom: 2rem;
     /* Add more space */
@@ -139,6 +140,23 @@ html {
 
 .github-link:hover {
     color: var(--accent-color);
+}
+
+.panel-footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
+    /* Push to bottom */
+}
+
+.panel-footer .github-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-size: 0.9rem;
 }
 
 .panel-content {
@@ -172,6 +190,11 @@ html {
     align-items: center;
 }
 
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .btn-paste {
     background: transparent;
     border: 1px solid var(--accent-color);
@@ -185,6 +208,23 @@ html {
 
 .btn-paste:hover {
     background: var(--accent-color);
+    color: white;
+}
+
+.btn-clear {
+    background: transparent;
+    border: 1px solid #ef4444;
+    /* Red-500 */
+    color: #ef4444;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background: #ef4444;
     color: white;
 }
 
@@ -276,6 +316,13 @@ input[type="range"] {
     justify-content: center;
     gap: 0.5rem;
     transition: background 0.2s;
+    width: 100%;
+}
+
+#btnPlayPause {
+    padding: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
 }
 
 .btn.primary {
@@ -328,6 +375,10 @@ input[type="range"] {
 
     /* Ensure the font select spans full width if needed, or fits in grid */
     .control-group:has(#fontSelect) {
+        grid-column: 1 / -1;
+    }
+
+    .control-group:has(#btnPlayPause) {
         grid-column: 1 / -1;
     }
 }
@@ -408,6 +459,25 @@ select {
     background-color: rgba(255, 255, 255, 0.3);
     pointer-events: none;
     z-index: 10;
+}
+
+/* Countdown Overlay */
+.countdown-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 15rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    z-index: 200;
+    display: none;
+    pointer-events: none;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.teleprompter-display.flipped .countdown-overlay {
+    transform: translate(-50%, -50%) scaleY(-1);
 }
 
 /* Immersive State (.is-playing on app-container) */
@@ -492,4 +562,68 @@ select {
     right: 70px;
     /* Position to the left of Exit button */
     font-size: 1rem;
+}
+
+/* Toggle Switch */
+.checkbox-label {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #4a4a4a;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: var(--accent-color);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--accent-color);
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
 }

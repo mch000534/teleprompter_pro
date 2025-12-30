@@ -19,6 +19,8 @@ State = {
   speed: number,           // 滾動速度 (1-10, 或 pixels/frame)
   isFlipped: boolean,      // 是否上下反轉
   scrollPosition: number,  // 當前滾動位置 (float)
+  enableCountdown: boolean,// 是否啟用倒數
+  isCountingDown: boolean, // 是否正在倒數中
   // Interaction State
   isImmersive: boolean,    // 是否全螢幕播放 (控制面板隱藏)
   isDragging: boolean,     // 是否正在手動拖曳
@@ -63,6 +65,7 @@ State = {
 ### 4.2 事件處理 (Event Handling)
 - **Input Change**: 即時更新 `State.text` 並渲染至顯示區。
 - **Paste Button**: 讀取剪貼簿權限與內容，並插入輸入框。
+- **Clear Button**: 清空輸入框內容 (需 `confirm` 確認以免誤觸)。
 - **Window Resize**: 重新計算容器高度，確保滾動邊界正確。
 - **Touch Events (Mobile/Tablet)**:
   - `touchstart`: 記錄起始 Y 座標，標記 `isDragging = true`。
@@ -74,7 +77,10 @@ State = {
   - `Esc`: 退出全螢幕 (如果支援) 或重置。
 
 ### 4.3 沉浸式播放模式 (Immersive Playback Mode)
-- **觸發條件**: 當 `State.isPlaying` 變為 `true` 時啟動；變為 `false` 時退出。
+- **觸發條件**:
+  - 當 `State.isPlaying` 變為 `true` 時啟動。
+  - 若 `State.enableCountdown` 為 `true`，先進入 `runCountdown()` (顯示 3-2-1)，結束後才真正開始滾動Loop。
+  - 變為 `false` 時退出。
 - **UI 行為**:
 - **UI 行為**:
   - 在 Root 容器 (`.app-container`) 新增 `.is-playing` class。

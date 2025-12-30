@@ -13,12 +13,17 @@ const State = {
     scrollPosition: 0,
     lastFrameTime: 0,
     guideHeight: 50,
+    guideHeight: 50,
     fontFamily: "'Noto Sans TC', sans-serif",
+    enableCountdown: true,
+    isCountingDown: false,
     // Interaction State
     isImmersive: false, // Controls UI visibility (Full page vs Settings)
     isDragging: false,
     touchHasMoved: false,
-    lastTouchY: 0
+    touchHasMoved: false,
+    lastTouchY: 0,
+    countdownTimer: null
 };
 
 // --- 2. DOM Elements ---
@@ -33,8 +38,8 @@ const Elements = {
     marginSlider: document.getElementById('marginSlider'),
     marginDisplay: document.getElementById('marginDisplay'),
     btnPlayPause: document.getElementById('btnPlayPause'),
-    btnReset: document.getElementById('btnReset'),
-    btnFlip: document.getElementById('btnFlip'),
+    btnPlayPause: document.getElementById('btnPlayPause'),
+    flipToggle: document.getElementById('flipToggle'),
     btnExit: document.getElementById('btnExit'),
     btnFullscreen: document.getElementById('btnFullscreen'),
     flipIndicator: document.getElementById('flipIndicator'),
@@ -42,7 +47,10 @@ const Elements = {
     guideHeightDisplay: document.getElementById('guideHeightDisplay'),
     guideLine: document.getElementById('guideLine'),
     fontSelect: document.getElementById('fontSelect'),
-    btnPaste: document.getElementById('btnPaste')
+    btnPaste: document.getElementById('btnPaste'),
+    btnClear: document.getElementById('btnClear'),
+    countdownToggle: document.getElementById('countdownToggle'),
+    countdownOverlay: document.getElementById('countdownOverlay')
 };
 
 // --- 3. UI Controller ---
@@ -85,8 +93,9 @@ function updateUI() {
         container.classList.remove('is-playing');
     }
 
-    // Button state reflects "Playing" status (scrolling or not)
-    // Note: When immersive, this button is hidden anyway, but good to keep sync.
+    // Button is always Play since we always reset
+    // No need to toggle text/icon if we don't support Pause state in UI
+    /*
     if (State.isPlaying) {
         icon.textContent = '⏸';
         text.textContent = ' 暫停';
@@ -98,14 +107,15 @@ function updateUI() {
         Elements.btnPlayPause.classList.add('primary');
         Elements.btnPlayPause.classList.remove('secondary');
     }
+    */
 
     // Sync Flip State
     if (State.isFlipped) {
         Elements.displayArea.classList.add('flipped');
-        Elements.btnFlip.classList.add('active');
+        if (Elements.flipToggle) Elements.flipToggle.checked = true;
     } else {
         Elements.displayArea.classList.remove('flipped');
-        Elements.btnFlip.classList.remove('active');
+        if (Elements.flipToggle) Elements.flipToggle.checked = false;
     }
 
     // Sync Guide Height
@@ -161,6 +171,17 @@ function initEvents() {
         });
     }
 
+    // Clear Button
+    if (Elements.btnClear) {
+        Elements.btnClear.addEventListener('click', () => {
+            if (confirm('確定要清除所有內容嗎？')) {
+                State.text = '';
+                Elements.scriptInput.value = '';
+                updateUI();
+            }
+        });
+    }
+
     // Font Size
     Elements.fontSizeSlider.addEventListener('input', (e) => {
         State.fontSize = parseInt(e.target.value, 10);
@@ -197,14 +218,25 @@ function initEvents() {
         });
     }
 
+    // Countdown Toggle
+    if (Elements.countdownToggle) {
+        Elements.countdownToggle.addEventListener('change', (e) => {
+            State.enableCountdown = e.target.checked;
+        });
+    }
+
     // Play Button (Enters Immersive + Starts)
     Elements.btnPlayPause.addEventListener('click', startImmersivePlayback);
 
-    // Reset
-    Elements.btnReset.addEventListener('click', resetScroll);
+
 
     // Flip Toggle
-    Elements.btnFlip.addEventListener('click', toggleFlip);
+    if (Elements.flipToggle) {
+        Elements.flipToggle.addEventListener('change', (e) => {
+            State.isFlipped = e.target.checked;
+            updateUI();
+        });
+    }
 
     // Exit Button
     if (Elements.btnExit) {
@@ -298,19 +330,77 @@ function initEvents() {
 
 function startImmersivePlayback() {
     State.isImmersive = true;
-    State.isPlaying = true;
 
     // Auto-enter fullscreen
     if (!document.fullscreenElement) {
         toggleFullscreen();
     }
 
-    State.lastFrameTime = performance.now();
-    requestAnimationFrame(renderLoop);
+    // Always reset scroll position to top when starting
+    State.scrollPosition = 0;
+    const scrollTarget = document.getElementById('scrollWrapper');
+    if (scrollTarget) scrollTarget.scrollTop = 0;
+    // Also reset displayArea just in case
+    Elements.displayArea.scrollTop = 0;
+
     updateUI();
+
+    if (State.enableCountdown) {
+        runCountdown(() => {
+            State.isPlaying = true;
+            State.lastFrameTime = performance.now();
+            requestAnimationFrame(renderLoop);
+            updateUI();
+        });
+    } else {
+        State.isPlaying = true;
+        State.lastFrameTime = performance.now();
+        requestAnimationFrame(renderLoop);
+        updateUI();
+    }
+}
+
+function runCountdown(callback) {
+    // Clear any existing timer to prevent duplicates
+    if (State.countdownTimer) {
+        clearInterval(State.countdownTimer);
+        State.countdownTimer = null;
+    }
+
+    State.isCountingDown = true;
+    Elements.countdownOverlay.style.display = 'block';
+
+    // Reset to initial count
+    let count = 3;
+    Elements.countdownOverlay.textContent = count;
+
+    State.countdownTimer = setInterval(() => {
+        count--;
+        if (count > 0) {
+            Elements.countdownOverlay.textContent = count;
+        } else {
+            clearInterval(State.countdownTimer);
+            State.countdownTimer = null;
+            Elements.countdownOverlay.style.display = 'none';
+            State.isCountingDown = false;
+
+            // Only proceed if we are still in immersive mode (user didn't exit during countdown)
+            if (State.isImmersive) {
+                callback();
+            }
+        }
+    }, 1000);
 }
 
 function exitImmersive() {
+    // Clear countdown if running
+    if (State.countdownTimer) {
+        clearInterval(State.countdownTimer);
+        State.countdownTimer = null;
+    }
+    Elements.countdownOverlay.style.display = 'none';
+    State.isCountingDown = false;
+
     State.isImmersive = false;
     State.isPlaying = false;
     resetScroll(); // Logic to reset position if desired, or just stop
@@ -319,13 +409,9 @@ function exitImmersive() {
 function togglePause() {
     if (!State.isImmersive) return;
 
-    State.isPlaying = !State.isPlaying;
-
-    if (State.isPlaying) {
-        State.lastFrameTime = performance.now();
-        requestAnimationFrame(renderLoop);
-    }
-    updateUI();
+    // User requested "No Pause", so tapping/space basically stops playback/exits immersive mode.
+    // togglePause now acts as "Stop"
+    exitImmersive();
 }
 
 function toggleFullscreen() {
@@ -364,10 +450,7 @@ function resetScroll() {
     updateUI();
 }
 
-function toggleFlip() {
-    State.isFlipped = !State.isFlipped;
-    updateUI();
-}
+
 
 function adjustScroll(delta) {
     State.scrollPosition += delta;

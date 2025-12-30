@@ -27,7 +27,7 @@
     - [x] 實作 `renderLoop()` 與 `requestAnimationFrame` 迴圈。
     - [x] 實作滾動位置計算邏輯 (`scrollTop += speed * multiplier`)。
     - [x] 實作 播放/暫停 按鈕邏輯。
-    - [x] 實作 重置 (Reset) 按鈕邏輯。
+    - [x] 實作 重置 (Reset) 邏輯 (按鈕已移除，由退出功能觸發)。
 
 ## Phase 3: 進階功能與視覺效果 (Advanced Features & Visuals)
 - [x] **畫面反轉功能 (Flip Feature)**
@@ -63,9 +63,15 @@
     - [x] **全頁設定模式 (Full Page Settings)**
         - [x] 修改 CSS 使 `.control-panel` 預設佔滿全螢幕。
         - [x] 播放時隱藏 `.control-panel` 並顯示 `.teleprompter-display`。
-    - [x] **貼上按鈕 (Paste Button)**
+        - [x] 調整按鈕佈局：播放按鈕置頂，反轉按鈕改為 Toggle Switch。
+    - [x] **快速操作按鈕 (Paste & Clear)**
         - [x] 新增貼上按鈕於輸入框旁。
         - [x] JS 實作剪貼簿讀取功能。
+        - [x] 新增清除按鈕與相關邏輯。
+    - [x] **倒數計時功能**
+        - [x] 新增倒數覆蓋層 (3-2-1 Animation)。
+        - [x] 新增設定開關 (Toggle Switch)。
+        - [x] 實作播放前倒數邏輯。
 
 ## Phase 3.7: Touch Interaction & Native Fullscreen Support
 - [x] **觸控滾動 (Touch Scroll)**
