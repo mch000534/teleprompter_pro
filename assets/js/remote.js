@@ -7,6 +7,7 @@ const RemoteState = {
     isConnected: false,
     isPlaying: false,
     isImmersive: false,  // 追蹤全屏狀態
+    isReversing: false,  // 追蹤倒播狀態
     speed: 3,
     text: ''
 };
@@ -75,6 +76,9 @@ function handleServerMessage(msg) {
             if (msg.data.isImmersive !== undefined) {
                 RemoteState.isImmersive = msg.data.isImmersive;
             }
+            if (msg.data.isReversing !== undefined) {
+                RemoteState.isReversing = msg.data.isReversing;
+            }
             if (msg.data.speed !== undefined) {
                 RemoteState.speed = msg.data.speed;
             }
@@ -142,26 +146,49 @@ function updateUI() {
     const playStatusEl = document.getElementById('playStatus');
     const playPauseIcon = document.getElementById('playPauseIcon');
     const playPauseLabel = document.getElementById('playPauseLabel');
+    const rewindIcon = document.getElementById('rewindIcon');
+    const rewindLabel = document.getElementById('rewindLabel');
 
-    if (RemoteState.isPlaying) {
+    if (RemoteState.isPlaying && RemoteState.isReversing) {
+        // 倒播中
+        playStatusEl.textContent = '倒播中';
+        playStatusEl.classList.add('playing');
+        playStatusEl.classList.remove('paused');
+        // 播放按鈕顯示「播放」
+        playPauseIcon.textContent = '⏩';
+        playPauseLabel.textContent = '播放';
+        // 倒播按鈕顯示「暫停」
+        rewindIcon.textContent = '⏸';
+        rewindLabel.textContent = '暫停';
+    } else if (RemoteState.isPlaying) {
+        // 正向播放中
         playStatusEl.textContent = '播放中';
         playStatusEl.classList.add('playing');
         playStatusEl.classList.remove('paused');
+        // 播放按鈕顯示「暫停」
         playPauseIcon.textContent = '⏸';
         playPauseLabel.textContent = '暫停';
+        // 倒播按鈕顯示「倒播」
+        rewindIcon.textContent = '⏪';
+        rewindLabel.textContent = '倒播';
     } else if (RemoteState.isImmersive) {
         // 全屏但暫停中
         playStatusEl.textContent = '已暫停';
         playStatusEl.classList.remove('playing');
         playStatusEl.classList.add('paused');
-        playPauseIcon.textContent = '▶';
-        playPauseLabel.textContent = '繼續';
+        // 兩個按鈕都顯示各自功能
+        playPauseIcon.textContent = '⏩';
+        playPauseLabel.textContent = '播放';
+        rewindIcon.textContent = '⏪';
+        rewindLabel.textContent = '倒播';
     } else {
         playStatusEl.textContent = '已停止';
         playStatusEl.classList.remove('playing');
         playStatusEl.classList.remove('paused');
-        playPauseIcon.textContent = '▶';
+        playPauseIcon.textContent = '⏩';
         playPauseLabel.textContent = '播放';
+        rewindIcon.textContent = '⏪';
+        rewindLabel.textContent = '倒播';
     }
 
     // Update speed
@@ -171,14 +198,26 @@ function updateUI() {
 
 // --- Event Listeners ---
 function initEvents() {
-    // Play/Pause
+    // Play - 播放中按暫停，否則正向播放
     document.getElementById('btnPlayPause').addEventListener('click', () => {
-        sendCommand(RemoteState.isPlaying ? 'pause' : 'play');
+        if (RemoteState.isPlaying && !RemoteState.isReversing) {
+            // 正在正向播放 -> 暫停
+            sendCommand('pause');
+        } else {
+            // 暫停/停止/倒播中 -> 正向播放
+            sendCommand('play');
+        }
     });
 
-    // Stop
-    document.getElementById('btnStop').addEventListener('click', () => {
-        sendCommand('stop');
+    // Rewind - 倒播中按暫停，否則反向播放
+    document.getElementById('btnRewind').addEventListener('click', () => {
+        if (RemoteState.isPlaying && RemoteState.isReversing) {
+            // 正在倒播 -> 暫停
+            sendCommand('pause');
+        } else {
+            // 暫停/停止/正向播放中 -> 倒播
+            sendCommand('rewind');
+        }
     });
 
     // Speed Up
@@ -223,6 +262,20 @@ function initEvents() {
         textSyncTimeout = setTimeout(() => {
             sendText(e.target.value);
         }, 500); // Debounce 500ms
+    });
+
+    // Expand Editor
+    document.getElementById('btnExpand').addEventListener('click', () => {
+        document.body.classList.add('fullscreen-editing');
+        document.getElementById('textEditor').focus();
+    });
+
+    // Collapse Editor (Done)
+    document.getElementById('btnCollapse').addEventListener('click', () => {
+        document.body.classList.remove('fullscreen-editing');
+        // 手動觸發一次同步以確保內容更新
+        const text = document.getElementById('textEditor').value;
+        sendText(text);
     });
 
     // Prevent zoom on double tap

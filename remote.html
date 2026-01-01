@@ -40,12 +40,12 @@
         <!-- Control Buttons -->
         <section class="control-section">
             <div class="control-row main-controls">
-                <button class="control-btn btn-stop" id="btnStop" title="停止">
-                    <span class="btn-icon">⏹</span>
-                    <span class="btn-label">停止</span>
+                <button class="control-btn btn-rewind" id="btnRewind" title="倒播">
+                    <span class="btn-icon" id="rewindIcon">⏪</span>
+                    <span class="btn-label" id="rewindLabel">倒播</span>
                 </button>
                 <button class="control-btn btn-play-pause" id="btnPlayPause" title="播放/暫停">
-                    <span class="btn-icon" id="playPauseIcon">▶</span>
+                    <span class="btn-icon" id="playPauseIcon">⏩</span>
                     <span class="btn-label" id="playPauseLabel">播放</span>
                 </button>
             </div>
@@ -79,7 +79,15 @@
         <!-- Text Editor -->
         <section class="editor-section">
             <div class="editor-header">
-                <label for="textEditor">✏️ 提詞稿內容</label>
+                <div class="editor-title-group">
+                    <label for="textEditor">✏️ 提詞稿</label>
+                    <button class="btn-expand" id="btnExpand" title="全屏編輯">
+                        ⤢ 展開
+                    </button>
+                    <button class="btn-collapse" id="btnCollapse" title="完成編輯">
+                        ✅ 完成
+                    </button>
+                </div>
                 <button class="btn-sync" id="btnSync" title="同步至提詞器">
                     🔄 同步
                 </button>
@@ -91,6 +99,12 @@
         <footer class="remote-footer">
             <p>提詞器 Teleprompter Pro</p>
         </footer>
+    </div>
+
+    <!-- 橫向螢幕警告 -->
+    <div class="landscape-warning">
+        <span class="icon">📱</span>
+        <span class="message">請將手機轉為直向使用</span>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>

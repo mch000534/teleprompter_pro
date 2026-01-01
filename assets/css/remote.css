@@ -3,13 +3,13 @@
  */
 
 :root {
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --bg-card: #0f3460;
-    --accent-primary: #e94560;
-    --accent-secondary: #0f3460;
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2a2a2a;
+    --bg-card: #3a3a3a;
+    --accent-primary: #4a4a4a;
+    --accent-secondary: #3a3a3a;
     --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
+    --text-secondary: #888888;
     --success: #4ade80;
     --warning: #fbbf24;
     --danger: #f87171;
@@ -22,6 +22,9 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    /* 禁用選取 */
+    user-select: none;
 }
 
 html,
@@ -34,7 +37,7 @@ body {
 
 body {
     font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
     display: flex;
@@ -46,10 +49,11 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 16px;
-    gap: 16px;
+    width: 100%;
+    /* 佔滿寬度 */
+    margin: 0;
+    padding: 12px;
+    gap: 12px;
     overflow-y: auto;
 }
 
@@ -182,24 +186,27 @@ body {
 
 /* Button Variants */
 .btn-play-pause {
-    background: linear-gradient(135deg, var(--accent-primary), #d63851);
-    flex: 1.5;
+    background: #505050;
 }
 
 .btn-play-pause:active {
-    background: linear-gradient(135deg, #d63851, var(--accent-primary));
+    background: #606060;
 }
 
-.btn-stop {
-    background: var(--bg-secondary);
+.btn-rewind {
+    background: #505050;
+}
+
+.btn-rewind:active {
+    background: #606060;
 }
 
 .btn-speed {
-    background: var(--accent-secondary);
+    background: var(--bg-card);
 }
 
 .btn-scroll {
-    background: var(--bg-secondary);
+    background: var(--bg-card);
 }
 
 /* Speed Display */
@@ -219,12 +226,16 @@ body {
 }
 
 /* --- Editor Section --- */
+/* --- Editor Section --- */
 .editor-section {
-    flex: 1;
+    /* flex: 1; 移除 flex: 1，避免佔用剩餘空間 */
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-height: 200px;
+    /* min-height: 200px; 移除最小高度 */
+    margin-top: auto;
+    /* 推到底部，或者直接跟隨上面的內容 */
+    padding-bottom: 20px;
 }
 
 .editor-header {
@@ -238,11 +249,47 @@ body {
     font-weight: 600;
 }
 
+.editor-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-expand,
+.btn-collapse {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 16px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-expand:active,
+.btn-collapse:active {
+    background: #505050;
+    color: var(--text-primary);
+}
+
+.btn-collapse {
+    display: none;
+    /* 預設隱藏完成按鈕 */
+    background: var(--success);
+    color: #000;
+}
+
+.btn-collapse:active {
+    background: #3ac16e;
+    color: #000;
+}
+
 .btn-sync {
     padding: 8px 16px;
     border: none;
     border-radius: 20px;
-    background: var(--accent-primary);
+    background: #505050;
     color: var(--text-primary);
     font-family: inherit;
     font-size: 0.9rem;
@@ -252,10 +299,12 @@ body {
 
 .btn-sync:active {
     transform: scale(0.95);
-    background: #d63851;
+    background: #606060;
 }
 
 #textEditor {
+    display: none;
+    /* 預設隱藏，點擊展開後全屏顯示 */
     flex: 1;
     width: 100%;
     min-height: 150px;
@@ -268,6 +317,9 @@ body {
     font-size: 1rem;
     line-height: 1.6;
     resize: none;
+    -webkit-user-select: text;
+    /* 允許選取 */
+    user-select: text;
 }
 
 #textEditor::placeholder {
@@ -277,6 +329,39 @@ body {
 #textEditor:focus {
     outline: 2px solid var(--accent-primary);
     outline-offset: -2px;
+}
+
+/* --- Fullscreen Mode --- */
+body.fullscreen-editing .editor-section {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background: var(--bg-primary);
+    padding: 16px;
+    margin: 0;
+}
+
+body.fullscreen-editing .control-section,
+body.fullscreen-editing .remote-footer {
+    display: none;
+}
+
+body.fullscreen-editing .btn-expand {
+    display: none;
+}
+
+body.fullscreen-editing .btn-collapse {
+    display: block;
+}
+
+body.fullscreen-editing #textEditor {
+    display: block;
+    /* 滿屏時顯示 */
+    font-size: 1.1rem;
+    line-height: 1.8;
 }
 
 /* --- Footer --- */
@@ -316,5 +401,42 @@ body {
 
     .editor-section {
         min-height: 120px;
+    }
+}
+
+/* 橫向螢幕提示 - 請轉為直向 */
+.landscape-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    color: var(--text-primary);
+    text-align: center;
+    padding: 20px;
+}
+
+.landscape-warning .icon {
+    font-size: 4rem;
+}
+
+.landscape-warning .message {
+    font-size: 1.2rem;
+}
+
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    .landscape-warning {
+        display: flex;
+    }
+
+    .remote-container {
+        display: none;
     }
 }

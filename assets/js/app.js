@@ -5,6 +5,7 @@
 // --- 1. State Management ---
 const State = {
     isPlaying: false,
+    isReversing: false, // 倒播模式
     text: '',
     fontSize: 48,
     speed: 3,
@@ -501,8 +502,12 @@ function renderLoop(timestamp) {
 
     if (rawSpeed === 0) pixelsPerFrame = 0;
 
-    // Update Position
-    State.scrollPosition += pixelsPerFrame;
+    // Update Position - 根據 isReversing 決定方向
+    if (State.isReversing) {
+        State.scrollPosition -= pixelsPerFrame; // 倒播
+    } else {
+        State.scrollPosition += pixelsPerFrame; // 正常播放
+    }
 
     // Apply to DOM
     const scrollTarget = document.getElementById('scrollWrapper');
@@ -514,11 +519,24 @@ function renderLoop(timestamp) {
 
     scrollTarget.scrollTop = State.scrollPosition;
 
-    // Auto-stop at bottom
+    // Auto-stop at boundaries
     const maxScroll = scrollTarget.scrollHeight - scrollTarget.clientHeight;
-    if (State.scrollPosition >= maxScroll + 50) {
+
+    // 到達底部時停止（正向播放）
+    if (!State.isReversing && State.scrollPosition >= maxScroll + 50) {
         State.isPlaying = false;
         updateUI();
+        sendState();
+        return;
+    }
+
+    // 到達頂部時停止（倒播）
+    if (State.isReversing && State.scrollPosition <= 0) {
+        State.scrollPosition = 0;
+        State.isPlaying = false;
+        State.isReversing = false;
+        updateUI();
+        sendState();
         return;
     }
 
@@ -595,9 +613,14 @@ function handleRemoteCommand(msg) {
                         startImmersivePlayback();
                     } else if (!State.isPlaying) {
                         // Resume if paused - 繼續播放而非退出
+                        State.isReversing = false; // 重設為正向播放
                         State.isPlaying = true;
                         State.lastFrameTime = performance.now();
                         requestAnimationFrame(renderLoop);
+                        sendState();
+                    } else if (State.isReversing) {
+                        // 如果正在倒播，切換為正向播放
+                        State.isReversing = false;
                         sendState();
                     }
                     break;
@@ -606,6 +629,19 @@ function handleRemoteCommand(msg) {
                     // 只暫停，不退出全屏模式
                     if (State.isImmersive && State.isPlaying) {
                         State.isPlaying = false;
+                        sendState();
+                    }
+                    break;
+
+                case 'rewind':
+                    // 倒播 - 切換為反向播放模式
+                    if (State.isImmersive) {
+                        State.isReversing = true;
+                        if (!State.isPlaying) {
+                            State.isPlaying = true;
+                            State.lastFrameTime = performance.now();
+                            requestAnimationFrame(renderLoop);
+                        }
                         sendState();
                     }
                     break;
@@ -649,6 +685,7 @@ function sendState() {
             data: {
                 isPlaying: State.isPlaying,
                 isImmersive: State.isImmersive,
+                isReversing: State.isReversing,
                 speed: State.speed,
                 text: State.text
             }
