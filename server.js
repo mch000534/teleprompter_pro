@@ -48,11 +48,23 @@ const localIP = getLocalIP();
 // --- HTTP Server (Static Files) ---
 const server = http.createServer(async (req, res) => {
     let filePath = req.url === '/' ? '/index.html' : req.url;
-    
+
     // API: Generate QR Code
     if (filePath === '/api/qrcode') {
         try {
-            const remoteUrl = `http://${localIP}:${PORT}/remote.html`;
+            // 優先使用請求的 Host header (支援雲端部署)
+            const host = req.headers.host;
+            const protocol = req.headers['x-forwarded-proto'] || 'http';
+
+            // 如果是雲端部署 (非本地 IP/localhost)，使用請求的 Host
+            let remoteUrl;
+            if (host && !host.includes('localhost') && !host.match(/^\d+\.\d+\.\d+\.\d+/)) {
+                remoteUrl = `${protocol}://${host}/remote.html`;
+            } else {
+                // 本地開發環境使用本地 IP
+                remoteUrl = `http://${localIP}:${PORT}/remote.html`;
+            }
+
             const qrDataUrl = await QRCode.toDataURL(remoteUrl, {
                 width: 200,
                 margin: 2,
@@ -62,10 +74,10 @@ const server = http.createServer(async (req, res) => {
                 }
             });
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ 
-                qrcode: qrDataUrl, 
+            res.end(JSON.stringify({
+                qrcode: qrDataUrl,
                 url: remoteUrl,
-                ip: localIP,
+                ip: host || localIP,
                 port: PORT
             }));
         } catch (err) {
@@ -74,12 +86,12 @@ const server = http.createServer(async (req, res) => {
         }
         return;
     }
-    
+
     // Serve static files
     filePath = path.join(__dirname, filePath);
     const ext = path.extname(filePath).toLowerCase();
     const contentType = mimeTypes[ext] || 'application/octet-stream';
-    
+
     fs.readFile(filePath, (err, content) => {
         if (err) {
             if (err.code === 'ENOENT') {
@@ -116,9 +128,9 @@ let currentState = {
 wss.on('connection', (ws, req) => {
     const urlParams = new URL(req.url, `http://${req.headers.host}`).searchParams;
     const clientType = urlParams.get('type') || 'remote';
-    
+
     console.log(`Client connected: ${clientType}`);
-    
+
     if (clientType === 'teleprompter') {
         clients.teleprompter = ws;
         // Send current state to new teleprompter
@@ -128,12 +140,12 @@ wss.on('connection', (ws, req) => {
         // Send current state to new remote
         ws.send(JSON.stringify({ type: 'state', data: currentState }));
     }
-    
+
     ws.on('message', (message) => {
         try {
             const msg = JSON.parse(message.toString());
             console.log(`Message from ${clientType}:`, msg);
-            
+
             switch (msg.type) {
                 case 'command':
                     // Forward command to teleprompter
@@ -141,13 +153,13 @@ wss.on('connection', (ws, req) => {
                         clients.teleprompter.send(JSON.stringify(msg));
                     }
                     break;
-                    
+
                 case 'state':
                     // Update and broadcast state
                     currentState = { ...currentState, ...msg.data };
                     broadcastState();
                     break;
-                    
+
                 case 'text':
                     // Text update from remote
                     currentState.text = msg.data;
@@ -163,7 +175,7 @@ wss.on('connection', (ws, req) => {
             console.error('Invalid message:', err);
         }
     });
-    
+
     ws.on('close', () => {
         console.log(`Client disconnected: ${clientType}`);
         if (clientType === 'teleprompter') {
@@ -172,7 +184,7 @@ wss.on('connection', (ws, req) => {
             clients.remotes.delete(ws);
         }
     });
-    
+
     ws.on('error', (err) => {
         console.error('WebSocket error:', err);
     });
@@ -180,11 +192,11 @@ wss.on('connection', (ws, req) => {
 
 function broadcastState() {
     const msg = JSON.stringify({ type: 'state', data: currentState });
-    
+
     if (clients.teleprompter && clients.teleprompter.readyState === 1) {
         clients.teleprompter.send(msg);
     }
-    
+
     clients.remotes.forEach(client => {
         if (client.readyState === 1) {
             client.send(msg);
