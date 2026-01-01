@@ -134,6 +134,10 @@ function initEvents() {
     Elements.scriptInput.addEventListener('input', (e) => {
         State.text = e.target.value;
         updateUI();
+        // 同步文字到遙控器
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'text', data: State.text }));
+        }
     });
 
     // Paste Button
@@ -351,12 +355,14 @@ function startImmersivePlayback() {
             State.lastFrameTime = performance.now();
             requestAnimationFrame(renderLoop);
             updateUI();
+            sendState(); // 同步播放狀態到遙控器
         });
     } else {
         State.isPlaying = true;
         State.lastFrameTime = performance.now();
         requestAnimationFrame(renderLoop);
         updateUI();
+        sendState(); // 同步播放狀態到遙控器
     }
 }
 
@@ -409,9 +415,18 @@ function exitImmersive() {
 function togglePause() {
     if (!State.isImmersive) return;
 
-    // User requested "No Pause", so tapping/space basically stops playback/exits immersive mode.
-    // togglePause now acts as "Stop"
-    exitImmersive();
+    // 暫停/繼續播放，不退出全屏模式
+    if (State.isPlaying) {
+        // 暫停播放
+        State.isPlaying = false;
+        sendState();
+    } else {
+        // 繼續播放
+        State.isPlaying = true;
+        State.lastFrameTime = performance.now();
+        requestAnimationFrame(renderLoop);
+        sendState();
+    }
 }
 
 function toggleFullscreen() {
@@ -579,14 +594,22 @@ function handleRemoteCommand(msg) {
                     if (!State.isImmersive) {
                         startImmersivePlayback();
                     } else if (!State.isPlaying) {
-                        // Resume if paused (though current logic treats pause as stop)
+                        // Resume if paused - 繼續播放而非退出
                         State.isPlaying = true;
                         State.lastFrameTime = performance.now();
                         requestAnimationFrame(renderLoop);
+                        sendState();
                     }
                     break;
 
                 case 'pause':
+                    // 只暫停，不退出全屏模式
+                    if (State.isImmersive && State.isPlaying) {
+                        State.isPlaying = false;
+                        sendState();
+                    }
+                    break;
+
                 case 'stop':
                     if (State.isImmersive) {
                         exitImmersive();

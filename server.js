@@ -14,7 +14,7 @@ const { WebSocketServer } = require('ws');
 const QRCode = require('qrcode');
 const os = require('os');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // --- MIME Types ---
 const mimeTypes = {

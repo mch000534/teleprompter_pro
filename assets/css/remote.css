@@ -24,9 +24,12 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     overflow: hidden;
+    touch-action: manipulation;
+    /* 禁止雙 tap 放大 */
 }
 
 body {
@@ -92,8 +95,15 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 /* --- Status Section --- */
@@ -283,7 +293,7 @@ body {
         min-height: 100px;
         padding: 24px 16px;
     }
-    
+
     .btn-icon {
         font-size: 2.5rem;
     }
@@ -294,16 +304,16 @@ body {
         padding: 8px;
         gap: 8px;
     }
-    
+
     .control-btn {
         min-height: 70px;
         padding: 12px;
     }
-    
+
     .btn-icon {
         font-size: 1.5rem;
     }
-    
+
     .editor-section {
         min-height: 120px;
     }

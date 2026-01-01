@@ -6,6 +6,7 @@
 const RemoteState = {
     isConnected: false,
     isPlaying: false,
+    isImmersive: false,  // 追蹤全屏狀態
     speed: 3,
     text: ''
 };
@@ -15,6 +16,12 @@ let ws = null;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
 const RECONNECT_DELAY = 2000;
+
+// --- NoSleep 防止手機休眠 ---
+let noSleep = null;
+if (typeof NoSleep !== 'undefined') {
+    noSleep = new NoSleep();
+}
 
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -64,6 +71,9 @@ function handleServerMessage(msg) {
             // Update local state
             if (msg.data.isPlaying !== undefined) {
                 RemoteState.isPlaying = msg.data.isPlaying;
+            }
+            if (msg.data.isImmersive !== undefined) {
+                RemoteState.isImmersive = msg.data.isImmersive;
             }
             if (msg.data.speed !== undefined) {
                 RemoteState.speed = msg.data.speed;
@@ -136,11 +146,20 @@ function updateUI() {
     if (RemoteState.isPlaying) {
         playStatusEl.textContent = '播放中';
         playStatusEl.classList.add('playing');
+        playStatusEl.classList.remove('paused');
         playPauseIcon.textContent = '⏸';
         playPauseLabel.textContent = '暫停';
+    } else if (RemoteState.isImmersive) {
+        // 全屏但暫停中
+        playStatusEl.textContent = '已暫停';
+        playStatusEl.classList.remove('playing');
+        playStatusEl.classList.add('paused');
+        playPauseIcon.textContent = '▶';
+        playPauseLabel.textContent = '繼續';
     } else {
         playStatusEl.textContent = '已停止';
         playStatusEl.classList.remove('playing');
+        playStatusEl.classList.remove('paused');
         playPauseIcon.textContent = '▶';
         playPauseLabel.textContent = '播放';
     }
@@ -228,6 +247,15 @@ function init() {
     initEvents();
     connectWebSocket();
     updateUI();
+
+    // 頁面載入時就啟用 NoSleep 防止手機休眠
+    if (noSleep) {
+        // 需要用戶互動才能啟用，監聽第一次觸控
+        document.addEventListener('touchstart', function enableNoSleep() {
+            noSleep.enable();
+            document.removeEventListener('touchstart', enableNoSleep);
+        }, { once: true });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', init);

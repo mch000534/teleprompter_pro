@@ -4,7 +4,7 @@
 
 ## 線上演示 (Demo)
 
-[https://teleprompter.zeabur.app/](https://teleprompter.zeabur.app/)
+[https://teleprompter-pro.zeabur.app/](https://teleprompter-pro.zeabur.app/)
 
 ## ✨ 功能特色
 
@@ -30,7 +30,7 @@
 ## 🚀 使用方式
 
 ### 線上使用
-直接開啟 [Demo 網址](https://teleprompter.zeabur.app/)
+直接開啟 [Demo 網址](https://teleprompter-pro.zeabur.app/)
 
 ### 本地運行
 

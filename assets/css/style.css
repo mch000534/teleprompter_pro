@@ -381,6 +381,10 @@ input[type="range"] {
     .control-group:has(#btnPlayPause) {
         grid-column: 1 / -1;
     }
+
+    .control-group:has(#qrcodeContainer) {
+        grid-column: 1 / -1;
+    }
 }
 
 @media (max-width: 767px) {
