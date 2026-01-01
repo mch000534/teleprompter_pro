@@ -1,0 +1,310 @@
+/**
+ * Teleprompter Remote Control Styles
+ */
+
+:root {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-card: #0f3460;
+    --accent-primary: #e94560;
+    --accent-secondary: #0f3460;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --border-radius: 16px;
+    --transition: all 0.2s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Container --- */
+.remote-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 16px;
+    gap: 16px;
+    overflow-y: auto;
+}
+
+/* --- Header --- */
+.remote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+}
+
+.remote-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-card);
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--warning);
+    animation: pulse 1.5s infinite;
+}
+
+.connection-status.connected .status-dot {
+    background: var(--success);
+    animation: none;
+}
+
+.connection-status.disconnected .status-dot {
+    background: var(--danger);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* --- Status Section --- */
+.status-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.status-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    text-align: center;
+}
+
+.status-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.status-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.status-value.playing {
+    color: var(--success);
+}
+
+/* --- Control Section --- */
+.control-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.control-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.control-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px 16px;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    min-height: 90px;
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+.btn-icon {
+    font-size: 2rem;
+}
+
+.btn-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Button Variants */
+.btn-play-pause {
+    background: linear-gradient(135deg, var(--accent-primary), #d63851);
+    flex: 1.5;
+}
+
+.btn-play-pause:active {
+    background: linear-gradient(135deg, #d63851, var(--accent-primary));
+}
+
+.btn-stop {
+    background: var(--bg-secondary);
+}
+
+.btn-speed {
+    background: var(--accent-secondary);
+}
+
+.btn-scroll {
+    background: var(--bg-secondary);
+}
+
+/* Speed Display */
+.speed-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    padding: 16px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+}
+
+.speed-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+/* --- Editor Section --- */
+.editor-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 200px;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.editor-header label {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.btn-sync {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: var(--accent-primary);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-sync:active {
+    transform: scale(0.95);
+    background: #d63851;
+}
+
+#textEditor {
+    flex: 1;
+    width: 100%;
+    min-height: 150px;
+    padding: 16px;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: none;
+}
+
+#textEditor::placeholder {
+    color: var(--text-secondary);
+}
+
+#textEditor:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: -2px;
+}
+
+/* --- Footer --- */
+.remote-footer {
+    text-align: center;
+    padding: 12px 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* --- Responsive --- */
+@media (min-height: 800px) {
+    .control-btn {
+        min-height: 100px;
+        padding: 24px 16px;
+    }
+    
+    .btn-icon {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-height: 600px) {
+    .remote-container {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    .control-btn {
+        min-height: 70px;
+        padding: 12px;
+    }
+    
+    .btn-icon {
+        font-size: 1.5rem;
+    }
+    
+    .editor-section {
+        min-height: 120px;
+    }
+}

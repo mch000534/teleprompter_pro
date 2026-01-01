@@ -128,6 +128,20 @@
 
                 <!-- 操作按鈕 (已移至上方或整合至 Grid) -->
                 <div class="action-buttons" style="display: none;"></div>
+
+                <!-- 遙控器連線區塊 -->
+                <div class="remote-control-section">
+                    <div class="control-group">
+                        <label>📱 手機遙控</label>
+                        <div class="qrcode-container" id="qrcodeContainer">
+                            <div class="qrcode-loading">載入中...</div>
+                        </div>
+                        <div class="remote-url" id="remoteUrl"></div>
+                        <div class="connection-info" id="connectionInfo">
+                            <span class="ws-status" id="wsStatus">未連線</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="panel-footer">

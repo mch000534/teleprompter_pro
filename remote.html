@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>提詞器遙控器</title>
+    <link rel="stylesheet" href="assets/css/remote.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+
+<body>
+    <div class="remote-container">
+        <!-- Header -->
+        <header class="remote-header">
+            <h1>📱 遙控器</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">連線中...</span>
+            </div>
+        </header>
+
+        <!-- Status Display -->
+        <section class="status-section">
+            <div class="status-card">
+                <div class="status-label">狀態</div>
+                <div class="status-value" id="playStatus">已停止</div>
+            </div>
+            <div class="status-card">
+                <div class="status-label">速度</div>
+                <div class="status-value" id="speedStatus">3</div>
+            </div>
+        </section>
+
+        <!-- Control Buttons -->
+        <section class="control-section">
+            <div class="control-row main-controls">
+                <button class="control-btn btn-stop" id="btnStop" title="停止">
+                    <span class="btn-icon">⏹</span>
+                    <span class="btn-label">停止</span>
+                </button>
+                <button class="control-btn btn-play-pause" id="btnPlayPause" title="播放/暫停">
+                    <span class="btn-icon" id="playPauseIcon">▶</span>
+                    <span class="btn-label" id="playPauseLabel">播放</span>
+                </button>
+            </div>
+
+            <div class="control-row speed-controls">
+                <button class="control-btn btn-speed" id="btnSpeedDown" title="降低速度">
+                    <span class="btn-icon">🔽</span>
+                    <span class="btn-label">減速</span>
+                </button>
+                <div class="speed-display">
+                    <span class="speed-value" id="speedValue">3</span>
+                </div>
+                <button class="control-btn btn-speed" id="btnSpeedUp" title="提高速度">
+                    <span class="btn-icon">🔼</span>
+                    <span class="btn-label">加速</span>
+                </button>
+            </div>
+
+            <div class="control-row scroll-controls">
+                <button class="control-btn btn-scroll" id="btnScrollUp" title="向上滾動">
+                    <span class="btn-icon">⬆️</span>
+                    <span class="btn-label">上滾</span>
+                </button>
+                <button class="control-btn btn-scroll" id="btnScrollDown" title="向下滾動">
+                    <span class="btn-icon">⬇️</span>
+                    <span class="btn-label">下滾</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Text Editor -->
+        <section class="editor-section">
+            <div class="editor-header">
+                <label for="textEditor">✏️ 提詞稿內容</label>
+                <button class="btn-sync" id="btnSync" title="同步至提詞器">
+                    🔄 同步
+                </button>
+            </div>
+            <textarea id="textEditor" placeholder="在此輸入或貼上演講稿..."></textarea>
+        </section>
+
+        <!-- Footer -->
+        <footer class="remote-footer">
+            <p>提詞器 Teleprompter Pro</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/remote.js"></script>
+</body>
+
+</html>

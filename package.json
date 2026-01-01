@@ -1,0 +1,17 @@
+{
+  "name": "teleprompter-pro",
+  "version": "1.0.0",
+  "description": "專業提詞器應用程式 with WebSocket 遙控功能",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.14.0",
+    "qrcode": "^1.5.3"
+  },
+  "keywords": ["teleprompter", "websocket", "remote-control"],
+  "author": "",
+  "license": "MIT"
+}

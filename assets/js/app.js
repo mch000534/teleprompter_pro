@@ -510,10 +510,187 @@ function renderLoop(timestamp) {
     requestAnimationFrame(renderLoop);
 }
 
-// --- 6. Initialization ---
+// --- 6. WebSocket Client ---
+let ws = null;
+let wsReconnectAttempts = 0;
+const WS_MAX_RECONNECT = 5;
+const WS_RECONNECT_DELAY = 3000;
+
+function initWebSocket() {
+    // Only connect if running through the Node.js server (not file://)
+    if (window.location.protocol === 'file:') {
+        console.log('Running locally without server, WebSocket disabled');
+        const container = document.getElementById('qrcodeContainer');
+        if (container) {
+            container.innerHTML = '<div class="qrcode-loading">請使用 npm start 啟動伺服器</div>';
+        }
+        return;
+    }
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}?type=teleprompter`;
+
+    console.log('Connecting to WebSocket:', wsUrl);
+
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+        console.log('WebSocket connected');
+        wsReconnectAttempts = 0;
+        updateWSStatus(true);
+
+        // Send initial state
+        sendState();
+    };
+
+    ws.onclose = () => {
+        console.log('WebSocket disconnected');
+        updateWSStatus(false);
+
+        // Attempt reconnection
+        if (wsReconnectAttempts < WS_MAX_RECONNECT) {
+            wsReconnectAttempts++;
+            console.log(`Reconnecting... (${wsReconnectAttempts}/${WS_MAX_RECONNECT})`);
+            setTimeout(initWebSocket, WS_RECONNECT_DELAY);
+        }
+    };
+
+    ws.onerror = (err) => {
+        console.error('WebSocket error:', err);
+    };
+
+    ws.onmessage = (event) => {
+        try {
+            const msg = JSON.parse(event.data);
+            handleRemoteCommand(msg);
+        } catch (err) {
+            console.error('Invalid WebSocket message:', err);
+        }
+    };
+}
+
+function handleRemoteCommand(msg) {
+    console.log('Received command:', msg);
+
+    switch (msg.type) {
+        case 'command':
+            switch (msg.command) {
+                case 'play':
+                    if (!State.isImmersive) {
+                        startImmersivePlayback();
+                    } else if (!State.isPlaying) {
+                        // Resume if paused (though current logic treats pause as stop)
+                        State.isPlaying = true;
+                        State.lastFrameTime = performance.now();
+                        requestAnimationFrame(renderLoop);
+                    }
+                    break;
+
+                case 'pause':
+                case 'stop':
+                    if (State.isImmersive) {
+                        exitImmersive();
+                    }
+                    break;
+
+                case 'speed':
+                    if (msg.value !== undefined) {
+                        State.speed = Math.max(0, Math.min(100, parseInt(msg.value, 10)));
+                        Elements.speedSlider.value = State.speed;
+                        updateUI();
+                        sendState();
+                    }
+                    break;
+
+                case 'scroll':
+                    if (msg.value !== undefined) {
+                        adjustScroll(parseInt(msg.value, 10));
+                    }
+                    break;
+            }
+            break;
+
+        case 'text':
+            // Update text from remote
+            State.text = msg.data;
+            Elements.scriptInput.value = msg.data;
+            updateUI();
+            break;
+    }
+}
+
+function sendState() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: 'state',
+            data: {
+                isPlaying: State.isPlaying,
+                isImmersive: State.isImmersive,
+                speed: State.speed,
+                text: State.text
+            }
+        }));
+    }
+}
+
+function updateWSStatus(connected) {
+    const statusEl = document.getElementById('wsStatus');
+    if (statusEl) {
+        if (connected) {
+            statusEl.textContent = '✅ 已連線';
+            statusEl.classList.add('connected');
+        } else {
+            statusEl.textContent = '❌ 未連線';
+            statusEl.classList.remove('connected');
+        }
+    }
+}
+
+function loadQRCode() {
+    if (window.location.protocol === 'file:') return;
+
+    fetch('/api/qrcode')
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('qrcodeContainer');
+            const urlEl = document.getElementById('remoteUrl');
+
+            if (container && data.qrcode) {
+                container.innerHTML = `<img src="${data.qrcode}" alt="QR Code" class="qrcode-img">`;
+            }
+
+            if (urlEl && data.url) {
+                urlEl.innerHTML = `<a href="${data.url}" target="_blank">${data.url}</a>`;
+            }
+        })
+        .catch(err => {
+            console.error('Failed to load QR code:', err);
+            const container = document.getElementById('qrcodeContainer');
+            if (container) {
+                container.innerHTML = '<div class="qrcode-loading">無法載入 QR Code</div>';
+            }
+        });
+}
+
+// Hook into state changes to broadcast
+const originalStartImmersive = startImmersivePlayback;
+startImmersivePlayback = function () {
+    originalStartImmersive();
+    sendState();
+};
+
+const originalExitImmersive = exitImmersive;
+exitImmersive = function () {
+    originalExitImmersive();
+    sendState();
+};
+
+// --- 7. Initialization ---
 function init() {
     updateUI();
     initEvents();
+    initWebSocket();
+    loadQRCode();
 }
 
 init();

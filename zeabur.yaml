@@ -1,0 +1,8 @@
+# Zeabur 部署設定
+# https://zeabur.com/docs/deploy/customize-prebuilt
+
+# Node.js 環境自動偵測
+# Zeabur 會自動執行 npm install 和 npm start
+
+# 指定 Node.js 版本 (可選)
+# ZBPACK_NODEJS_VERSION: "18"

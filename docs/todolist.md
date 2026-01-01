@@ -93,3 +93,22 @@
 - [ ] **邊界測試**
     - 測試空文字或極短文字的行為。
     - 測試滾動到底部的停止行為。
+
+## Phase 5: WebSocket 手機遙控 (Remote Control via WebSocket)
+- [x] **伺服器端**
+    - [x] 建立 `package.json` (依賴 ws, qrcode)
+    - [x] 建立 `server.js` (HTTP + WebSocket 伺服器)
+- [x] **提詞器整合**
+    - [x] 修改 `index.html` 新增 QR Code 區塊
+    - [x] 修改 `app.js` 新增 WebSocket 客戶端
+    - [x] 新增 QR Code 樣式至 `style.css`
+- [x] **手機遙控器**
+    - [x] 建立 `remote.html` 遙控器頁面
+    - [x] 建立 `remote.css` 遙控器樣式
+    - [x] 建立 `remote.js` 遙控器邏輯
+- [x] **功能實作**
+    - [x] 播放/暫停/停止控制
+    - [x] 速度調整 (加速/減速)
+    - [x] 手動滾動 (上/下)
+    - [x] 即時修改提詞內容
+    - [x] 狀態同步顯示
