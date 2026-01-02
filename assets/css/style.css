@@ -679,14 +679,55 @@ input:checked+.slider:before {
 
 .ws-status {
     font-size: 0.85rem;
-    padding: 4px 12px;
+    padding: 6px 12px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.ws-status .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ef4444;
+    /* Default: Disconnected (Red) */
+    display: inline-block;
+}
+
+/* 未連線時紅燈閃爍 */
+.ws-status:not(.connected) .status-dot {
+    animation: pulse 1.5s infinite;
 }
 
 .ws-status.connected {
     background: rgba(16, 185, 129, 0.2);
     color: #10b981;
+}
+
+.ws-status.connected .status-dot {
+    background-color: #10b981;
+    /* Connected (Green) */
+    animation: none;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @media (min-width: 768px) {

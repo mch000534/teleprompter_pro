@@ -697,10 +697,10 @@ function updateWSStatus(connected) {
     const statusEl = document.getElementById('wsStatus');
     if (statusEl) {
         if (connected) {
-            statusEl.textContent = '✅ 已連線';
+            statusEl.innerHTML = '<span class="status-dot"></span> 已連線';
             statusEl.classList.add('connected');
         } else {
-            statusEl.textContent = '❌ 未連線';
+            statusEl.innerHTML = '<span class="status-dot"></span> 未連線';
             statusEl.classList.remove('connected');
         }
     }
