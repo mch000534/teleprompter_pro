@@ -46,8 +46,8 @@ npm install
 npm start
 
 # 4. 開啟瀏覽器
-# 提詞器：http://localhost:3000
-# 遙控器：http://[你的IP]:3000/remote.html
+# 提詞器：http://localhost:4000
+# 遙控器：http://[你的IP]:4000/remote.html
 ```
 
 ### 手機遙控連線
@@ -87,11 +87,7 @@ teleprompter_pro/
 └── zeabur.yaml          # 部署設定
 ```
 
-## 🌐 部署
 
-本專案支援 Zeabur 一鍵部署：
-
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/teleprompter)
 
 ## 授權
 
