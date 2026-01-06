@@ -100,6 +100,10 @@ State = {
   - 使用 `document.documentElement.requestFullscreen()` 與 `document.exitFullscreen()`。
   - 需監聽 `fullscreenchange` 事件以更新按鈕圖示 (選用)。
   - *注意*: 當退出播放模式時，若處於全螢幕，應自動退出全螢幕。
+- **手機橫向警告 (Landscape Warning)**:
+  - 在 `app-container` 外新增 `#landscapeWarning` 元素，以確保其不受 `.app-container` 的 CSS 影響（如反轉）。
+  - **樣式**: 全螢幕覆蓋，背景為 `rgba(0,0,0,0.75)`，文字倒立顯示 (`transform: rotate(180deg)`)。
+  - **觸發**: 透過 WebSocket 接收來自手機端的 `landscape` 訊息觸發顯示/隱藏。
 
 ### 4.4 樣式與邊距控制
 - **邊距 (Margin)**:
@@ -135,6 +139,15 @@ const TAP_DURATION = 300;    // 點擊最大時間 (ms)
 | 左滑 | `deltaX < -SWIPE_THRESHOLD && absX > absY` | `rewind` |
 | 單擊 | `absX < TAP_THRESHOLD && absY < TAP_THRESHOLD && duration < TAP_DURATION` | `pause` 或 `play/rewind` (保持原方向) |
 
-### 6.4 自動播放行為
 - WebSocket 連線成功後 100ms 自動發送 `play` 指令
 - 確保提詞器進入全螢幕播放模式
+
+## 7. WebSocket 通訊協定 (WebSocket Protocol)
+
+### 7.1 訊息類型
+| 類型 | 方向 | 說明 |
+|------|------|------|
+| `text` | 雙向 | 同步提詞稿內容 |
+| `command` | 手機 -> 電腦 | 控制指令 (`play`, `pause`, `stop`, `speed`, `scroll`, `rewind`) |
+| `state` | 電腦 -> 手機 | 同步播放器狀態 (`isPlaying`, `speed`, `text`, etc.) |
+| `landscape` | 手機 -> 電腦 | 當手機方向改變時發送 `{ isLandscape: boolean }` |

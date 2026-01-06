@@ -763,6 +763,7 @@ input:checked+.slider:before {
     color: #fff;
     text-align: center;
     padding: 40px;
+    /* transform 由 JavaScript 根據 State.isFlipped 動態控制 */
 }
 
 .landscape-warning .icon {

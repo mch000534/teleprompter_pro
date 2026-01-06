@@ -681,7 +681,11 @@ function handleRemoteCommand(msg) {
             const warningEl = document.getElementById('landscapeWarning');
             if (msg.isLandscape && State.isImmersive) {
                 document.body.classList.add('is-landscape-playing');
-                if (warningEl) warningEl.style.display = 'flex';
+                if (warningEl) {
+                    warningEl.style.display = 'flex';
+                    // 根據上下反轉設定決定警告是否反轉
+                    warningEl.style.transform = State.isFlipped ? 'rotate(180deg)' : 'none';
+                }
             } else {
                 document.body.classList.remove('is-landscape-playing');
                 if (warningEl) warningEl.style.display = 'none';
