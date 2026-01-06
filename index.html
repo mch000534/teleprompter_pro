@@ -165,7 +165,24 @@
     </div>
 
     <script src="assets/js/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
     <script>
+        // NoSleep 防止螢幕休眠
+        const noSleep = new NoSleep();
+        let noSleepEnabled = false;
+
+        function enableNoSleep() {
+            if (!noSleepEnabled) {
+                noSleep.enable();
+                noSleepEnabled = true;
+                console.log('NoSleep enabled');
+            }
+        }
+
+        // 在用戶第一次互動時啟用 NoSleep
+        document.addEventListener('click', enableNoSleep, { once: true });
+        document.addEventListener('touchstart', enableNoSleep, { once: true });
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')

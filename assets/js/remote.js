@@ -303,11 +303,20 @@ function init() {
 
     // 頁面載入時就啟用 NoSleep 防止手機休眠
     if (noSleep) {
-        // 需要用戶互動才能啟用，監聯第一次觸控
-        document.addEventListener('touchstart', function enableNoSleep() {
-            noSleep.enable();
-            document.removeEventListener('touchstart', enableNoSleep);
-        }, { once: true });
+        let noSleepEnabled = false;
+
+        function enableNoSleep() {
+            if (!noSleepEnabled) {
+                noSleep.enable();
+                noSleepEnabled = true;
+                console.log('NoSleep enabled on remote');
+            }
+        }
+
+        // 使用多種事件確保 NoSleep 能被啟用
+        document.addEventListener('click', enableNoSleep, { once: true });
+        document.addEventListener('touchstart', enableNoSleep, { once: true });
+        document.addEventListener('touchend', enableNoSleep, { once: true });
     }
 
     // 橫向偵測：當手機轉為橫向時暫停播放並通知主屏幕

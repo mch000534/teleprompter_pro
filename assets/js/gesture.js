@@ -284,10 +284,26 @@ function init() {
 
     // 頁面載入時就啟用 NoSleep 防止手機休眠
     if (noSleep) {
-        document.addEventListener('touchstart', function enableNoSleep() {
-            noSleep.enable();
-            document.removeEventListener('touchstart', enableNoSleep);
-        }, { once: true });
+        let noSleepEnabled = false;
+
+        function enableNoSleep() {
+            if (!noSleepEnabled) {
+                noSleep.enable();
+                noSleepEnabled = true;
+                console.log('NoSleep enabled on gesture');
+            }
+        }
+
+        // 使用多種事件確保 NoSleep 能被啟用
+        // 注意：gestureArea 使用 preventDefault，所以需要在其他元素上監聽
+        document.addEventListener('click', enableNoSleep, { once: true });
+        document.addEventListener('touchend', enableNoSleep, { once: true });
+
+        // 也在 gestureArea 的 touchend 中嘗試啟用（因為 touchstart 被 preventDefault）
+        const gestureArea = document.getElementById('gestureArea');
+        if (gestureArea) {
+            gestureArea.addEventListener('touchend', enableNoSleep, { once: true });
+        }
     }
 
     // 橫向偵測：當手機轉為橫向時暫停播放並通知主屏幕
