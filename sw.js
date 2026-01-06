@@ -1,7 +1,9 @@
-const CACHE_NAME = 'teleprompter-v1';
+const CACHE_NAME = 'teleprompter-v2';
 const ASSETS = [
     './',
     './index.html',
+    './remote.html',
+    './gesture.html',
     './assets/css/style.css',
     './assets/js/app.js',
     './manifest.json',
