@@ -120,8 +120,15 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 /* --- Status Section --- */
@@ -225,31 +232,31 @@ body {
     white-space: nowrap;
 }
 
-/* --- Instructions --- */
-.instructions-section {
+/* --- Instructions Inside Gesture Area --- */
+.instructions-inside {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 8px;
-    justify-content: center;
-    padding: 8px 0;
+    pointer-events: none;
+    opacity: 0.7;
 }
 
-.instruction-item {
+.instruction-row {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    background: var(--bg-card);
-    border-radius: 20px;
-    font-size: 0.85rem;
+    gap: 16px;
+    justify-content: center;
 }
 
-.instruction-icon {
-    font-size: 1rem;
-}
-
-.instruction-text {
+.instructions-inside .instruction-item {
+    font-size: 0.9rem;
     color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 12px;
+    border-radius: 16px;
 }
 
 /* --- Landscape Warning --- */
@@ -279,6 +286,11 @@ body {
     font-size: 1.2rem;
 }
 
+.landscape-warning .sub-message {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
 @media screen and (orientation: landscape) and (max-height: 500px) {
     .landscape-warning {
         display: flex;
@@ -294,7 +306,7 @@ body {
     .gesture-area {
         min-height: 300px;
     }
-    
+
     .hint-icon {
         font-size: 4rem;
     }
@@ -305,19 +317,19 @@ body {
         padding: 8px;
         gap: 8px;
     }
-    
+
     .gesture-area {
         min-height: 150px;
     }
-    
+
     .hint-icon {
         font-size: 2rem;
     }
-    
+
     .instructions-section {
         padding: 4px 0;
     }
-    
+
     .instruction-item {
         padding: 6px 10px;
         font-size: 0.75rem;

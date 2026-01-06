@@ -8,7 +8,7 @@ const State = {
     isReversing: false, // 倒播模式
     text: '',
     fontSize: 48,
-    speed: 3,
+    speed: 5,
     margin: 5,
     isFlipped: true,
     scrollPosition: 0,
@@ -675,6 +675,18 @@ function handleRemoteCommand(msg) {
             Elements.scriptInput.value = msg.data;
             updateUI();
             break;
+
+        case 'landscape':
+            // 手機橫向時顯示警告
+            const warningEl = document.getElementById('landscapeWarning');
+            if (msg.isLandscape && State.isImmersive) {
+                document.body.classList.add('is-landscape-playing');
+                if (warningEl) warningEl.style.display = 'flex';
+            } else {
+                document.body.classList.remove('is-landscape-playing');
+                if (warningEl) warningEl.style.display = 'none';
+            }
+            break;
     }
 }
 
@@ -751,6 +763,7 @@ function init() {
     initEvents();
     initWebSocket();
     loadQRCode();
+    // 橫向警告由手機端通過 WebSocket 控制 (handleRemoteCommand 中的 'landscape' case)
 }
 
 init();

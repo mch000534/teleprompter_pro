@@ -8,7 +8,7 @@ const RemoteState = {
     isPlaying: false,
     isImmersive: false,  // 追蹤全屏狀態
     isReversing: false,  // 追蹤倒播狀態
-    speed: 3,
+    speed: 5,
     text: ''
 };
 
@@ -303,12 +303,37 @@ function init() {
 
     // 頁面載入時就啟用 NoSleep 防止手機休眠
     if (noSleep) {
-        // 需要用戶互動才能啟用，監聽第一次觸控
+        // 需要用戶互動才能啟用，監聯第一次觸控
         document.addEventListener('touchstart', function enableNoSleep() {
             noSleep.enable();
             document.removeEventListener('touchstart', enableNoSleep);
         }, { once: true });
     }
+
+    // 橫向偵測：當手機轉為橫向時暫停播放並通知主屏幕
+    function checkOrientation() {
+        const isLandscape = window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches;
+        if (isLandscape) {
+            if (RemoteState.isPlaying) {
+                sendCommand('pause');
+            }
+            // 通知主屏幕顯示橫向警告
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'landscape', isLandscape: true }));
+            }
+            console.log('Landscape detected, pausing playback');
+        } else {
+            // 通知主屏幕關閉橫向警告
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'landscape', isLandscape: false }));
+            }
+        }
+    }
+
+    // 監聽方向變化
+    window.matchMedia("(orientation: landscape) and (max-height: 500px)").addEventListener('change', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('resize', checkOrientation);
 }
 
 document.addEventListener('DOMContentLoaded', init);

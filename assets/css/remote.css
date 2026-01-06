@@ -442,6 +442,11 @@ body.fullscreen-editing #textEditor {
     font-size: 1.2rem;
 }
 
+.landscape-warning .sub-message {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
 @media screen and (orientation: landscape) and (max-height: 500px) {
     .landscape-warning {
         display: flex;

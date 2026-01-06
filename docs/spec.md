@@ -16,7 +16,7 @@ State = {
   isPlaying: boolean,      // 是否正在播放
   text: string,            // 提詞稿內容
   fontSize: number,        // 字體大小 (px/rem)
-  speed: number,           // 滾動速度 (1-10, 或 pixels/frame)
+  speed: number,           // 滾動速度 (1-100，預設為 5)
   isFlipped: boolean,      // 是否上下反轉
   scrollPosition: number,  // 當前滾動位置 (float)
   enableCountdown: boolean,// 是否啟用倒數
@@ -130,7 +130,7 @@ const TAP_DURATION = 300;    // 點擊最大時間 (ms)
 | 手勢 | 判斷條件 | 指令 |
 |------|----------|------|
 | 上滑 | `deltaY < -SWIPE_THRESHOLD && absY > absX` | `speed += 5` |
-| 下滑 | `deltaY > SWIPE_THRESHOLD && absY > absX` | `speed -= 5` |
+| 下滑 | `deltaY > SWIPE_THRESHOLD && absY > absX` | `speed -= 5` (最小為 5) |
 | 右滑 | `deltaX > SWIPE_THRESHOLD && absX > absY` | `play` |
 | 左滑 | `deltaX < -SWIPE_THRESHOLD && absX > absY` | `rewind` |
 | 單擊 | `absX < TAP_THRESHOLD && absY < TAP_THRESHOLD && duration < TAP_DURATION` | `pause` 或 `play/rewind` (保持原方向) |

@@ -8,7 +8,7 @@ const GestureState = {
     isPlaying: false,
     isImmersive: false,
     isReversing: false,
-    speed: 3
+    speed: 5
 };
 
 // --- WebSocket Connection ---
@@ -181,12 +181,30 @@ function handleSwipeUp() {
     const newSpeed = Math.min(100, GestureState.speed + 5);
     sendCommand('speed', newSpeed);
     showFeedback('🔼', `加速 → ${newSpeed}`);
+
+    // 加速後按原有方向繼續播放
+    if (!GestureState.isPlaying) {
+        if (GestureState.isReversing) {
+            sendCommand('rewind');
+        } else {
+            sendCommand('play');
+        }
+    }
 }
 
 function handleSwipeDown() {
-    const newSpeed = Math.max(0, GestureState.speed - 5);
+    const newSpeed = Math.max(5, GestureState.speed - 5);
     sendCommand('speed', newSpeed);
     showFeedback('🔽', `減速 → ${newSpeed}`);
+
+    // 減速後按原有方向繼續播放
+    if (!GestureState.isPlaying) {
+        if (GestureState.isReversing) {
+            sendCommand('rewind');
+        } else {
+            sendCommand('play');
+        }
+    }
 }
 
 function handleSwipeLeft() {
@@ -271,6 +289,31 @@ function init() {
             document.removeEventListener('touchstart', enableNoSleep);
         }, { once: true });
     }
+
+    // 橫向偵測：當手機轉為橫向時暫停播放並通知主屏幕
+    function checkOrientation() {
+        const isLandscape = window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches;
+        if (isLandscape) {
+            if (GestureState.isPlaying) {
+                sendCommand('pause');
+            }
+            // 通知主屏幕顯示橫向警告
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'landscape', isLandscape: true }));
+            }
+            console.log('Landscape detected, pausing playback');
+        } else {
+            // 通知主屏幕關閉橫向警告
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'landscape', isLandscape: false }));
+            }
+        }
+    }
+
+    // 監聽方向變化
+    window.matchMedia("(orientation: landscape) and (max-height: 500px)").addEventListener('change', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('resize', checkOrientation);
 }
 
 document.addEventListener('DOMContentLoaded', init);

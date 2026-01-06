@@ -121,7 +121,7 @@ const clients = {
 let currentState = {
     isPlaying: false,
     isImmersive: false,
-    speed: 3,
+    speed: 5,
     text: ''
 };
 
@@ -169,6 +169,13 @@ wss.on('connection', (ws, req) => {
                     }
                     // Broadcast to other remotes
                     broadcastToRemotes({ type: 'text', data: msg.data }, ws);
+                    break;
+
+                case 'landscape':
+                    // Forward landscape status to teleprompter
+                    if (clients.teleprompter && clients.teleprompter.readyState === 1) {
+                        clients.teleprompter.send(JSON.stringify({ type: 'landscape', isLandscape: msg.isLandscape }));
+                    }
                     break;
             }
         } catch (err) {
