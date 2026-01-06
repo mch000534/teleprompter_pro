@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>手勢控制 - 提詞器遙控器</title>
+    <link rel="stylesheet" href="assets/css/gesture.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+
+<body>
+    <div class="gesture-container">
+        <!-- Header -->
+        <header class="gesture-header">
+            <a href="remote.html" class="btn-back" id="btnBack">
+                <span class="back-icon">←</span>
+                <span class="back-text">返回</span>
+            </a>
+            <h1>👆 手勢控制</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">連線中...</span>
+            </div>
+        </header>
+
+        <!-- Status Display -->
+        <section class="status-section">
+            <div class="status-card">
+                <div class="status-label">狀態</div>
+                <div class="status-value" id="playStatus">已停止</div>
+            </div>
+            <div class="status-card">
+                <div class="status-label">速度</div>
+                <div class="status-value" id="speedStatus">3</div>
+            </div>
+        </section>
+
+        <!-- Gesture Area -->
+        <section class="gesture-area" id="gestureArea">
+            <div class="gesture-feedback" id="gestureFeedback"></div>
+            <div class="gesture-hint">
+                <div class="hint-icon">👆</div>
+                <div class="hint-text">在此區域滑動或點擊</div>
+            </div>
+        </section>
+
+        <!-- Instructions -->
+        <section class="instructions-section">
+            <div class="instruction-item">
+                <span class="instruction-icon">⬆️</span>
+                <span class="instruction-text">上滑加速</span>
+            </div>
+            <div class="instruction-item">
+                <span class="instruction-icon">⬇️</span>
+                <span class="instruction-text">下滑減速</span>
+            </div>
+            <div class="instruction-item">
+                <span class="instruction-icon">➡️</span>
+                <span class="instruction-text">右滑播放</span>
+            </div>
+            <div class="instruction-item">
+                <span class="instruction-icon">⬅️</span>
+                <span class="instruction-text">左滑倒播</span>
+            </div>
+            <div class="instruction-item">
+                <span class="instruction-icon">👆</span>
+                <span class="instruction-text">點擊暫停/繼續</span>
+            </div>
+        </section>
+    </div>
+
+    <!-- 橫向螢幕警告 -->
+    <div class="landscape-warning">
+        <span class="icon">📱</span>
+        <span class="message">請將手機轉為直向使用</span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
+    <script src="assets/js/gesture.js"></script>
+</body>
+
+</html>

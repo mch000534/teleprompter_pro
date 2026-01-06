@@ -1,0 +1,325 @@
+/**
+ * Teleprompter Gesture Control Styles
+ */
+
+:root {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2a2a2a;
+    --bg-card: #3a3a3a;
+    --accent-primary: #4a4a4a;
+    --accent-secondary: #3a3a3a;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --border-radius: 16px;
+    --transition: all 0.2s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+body {
+    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Container --- */
+.gesture-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    gap: 12px;
+}
+
+/* --- Header --- */
+.gesture-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    gap: 12px;
+}
+
+.gesture-header h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    flex: 1;
+    text-align: center;
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--bg-card);
+    border-radius: 20px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.btn-back:active {
+    background: #505050;
+    transform: scale(0.95);
+}
+
+.back-icon {
+    font-size: 1.1rem;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--bg-card);
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--warning);
+    animation: pulse 1.5s infinite;
+}
+
+.connection-status.connected .status-dot {
+    background: var(--success);
+    animation: none;
+}
+
+.connection-status.disconnected .status-dot {
+    background: var(--danger);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* --- Status Section --- */
+.status-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.status-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: 12px;
+    text-align: center;
+}
+
+.status-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.status-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.status-value.playing {
+    color: var(--success);
+}
+
+.status-value.paused {
+    color: var(--warning);
+}
+
+/* --- Gesture Area --- */
+.gesture-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #2d2d3a 0%, #1e1e2a 100%);
+    border-radius: 24px;
+    border: 2px dashed #444;
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+}
+
+.gesture-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.hint-icon {
+    font-size: 3rem;
+    opacity: 0.6;
+}
+
+.hint-text {
+    font-size: 1rem;
+}
+
+/* --- Gesture Feedback --- */
+.gesture-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 36px;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.gesture-feedback.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.feedback-icon {
+    font-size: 2.5rem;
+}
+
+.feedback-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+/* --- Instructions --- */
+.instructions-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 8px 0;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.instruction-icon {
+    font-size: 1rem;
+}
+
+.instruction-text {
+    color: var(--text-secondary);
+}
+
+/* --- Landscape Warning --- */
+.landscape-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    color: var(--text-primary);
+    text-align: center;
+    padding: 20px;
+}
+
+.landscape-warning .icon {
+    font-size: 4rem;
+}
+
+.landscape-warning .message {
+    font-size: 1.2rem;
+}
+
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    .landscape-warning {
+        display: flex;
+    }
+
+    .gesture-container {
+        display: none;
+    }
+}
+
+/* --- Responsive --- */
+@media (min-height: 700px) {
+    .gesture-area {
+        min-height: 300px;
+    }
+    
+    .hint-icon {
+        font-size: 4rem;
+    }
+}
+
+@media (max-height: 550px) {
+    .gesture-container {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    .gesture-area {
+        min-height: 150px;
+    }
+    
+    .hint-icon {
+        font-size: 2rem;
+    }
+    
+    .instructions-section {
+        padding: 4px 0;
+    }
+    
+    .instruction-item {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+}

@@ -111,3 +111,30 @@ State = {
 ## 5. 邊界情況處理 (Edge Cases)
 - **文字過短**: 當內容不足一頁時，不需要滾動。邏輯需判斷 `scrollHeight > clientHeight` 才啟動滾動。
 - **滾動到底**: 當 `scrollPosition` 到達底部時，自動停止播放 (`State.isPlaying = false`) 或循環播放 (視未來擴充需求而定，目前先實作停止)。
+
+## 6. 手勢控制規格 (Gesture Control Specification)
+
+### 6.1 頁面結構
+- **檔案**: `gesture.html`, `assets/js/gesture.js`, `assets/css/gesture.css`
+- **入口**: 從 `remote.html` 的「手勢控制」按鈕進入
+- **返回**: 頂部返回按鈕導回 `remote.html`
+
+### 6.2 手勢偵測參數
+```javascript
+const SWIPE_THRESHOLD = 50;  // 最小滑動距離 (px)
+const TAP_THRESHOLD = 10;    // 點擊最大移動距離 (px)
+const TAP_DURATION = 300;    // 點擊最大時間 (ms)
+```
+
+### 6.3 手勢對應指令
+| 手勢 | 判斷條件 | 指令 |
+|------|----------|------|
+| 上滑 | `deltaY < -SWIPE_THRESHOLD && absY > absX` | `speed += 5` |
+| 下滑 | `deltaY > SWIPE_THRESHOLD && absY > absX` | `speed -= 5` |
+| 右滑 | `deltaX > SWIPE_THRESHOLD && absX > absY` | `play` |
+| 左滑 | `deltaX < -SWIPE_THRESHOLD && absX > absY` | `rewind` |
+| 單擊 | `absX < TAP_THRESHOLD && absY < TAP_THRESHOLD && duration < TAP_DURATION` | `pause` 或 `play/rewind` (保持原方向) |
+
+### 6.4 自動播放行為
+- WebSocket 連線成功後 100ms 自動發送 `play` 指令
+- 確保提詞器進入全螢幕播放模式

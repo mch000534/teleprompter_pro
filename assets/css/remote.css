@@ -209,6 +209,17 @@ body {
     background: var(--bg-card);
 }
 
+/* Gesture Entry Button */
+.btn-gesture {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    text-decoration: none;
+    width: 100%;
+}
+
+.btn-gesture:active {
+    background: linear-gradient(135deg, #5a6578 0%, #3d4758 100%);
+}
+
 /* Speed Display */
 .speed-display {
     display: flex;
