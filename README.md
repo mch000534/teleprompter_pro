@@ -2,9 +2,9 @@
 
 一個專業的 Web 提詞器應用程式，支援手機遙控功能。專為內容創作者、演講者和專業錄製者設計。
 
-## 線上演示 (Demo)
+## 線上演示 (Base Version)
 
-[https://teleprompter-pro.zeabur.app/](https://teleprompter-pro.zeabur.app/)
+[https://mch000534.github.io/teleprompter/](https://mch000534.github.io/teleprompter/)
 
 ## ✨ 功能特色
 
