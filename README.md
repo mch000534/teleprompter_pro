@@ -43,9 +43,6 @@
 
 ## 🚀 使用方式
 
-### 線上使用
-直接開啟 [Demo 網址](https://teleprompter-pro.zeabur.app/)
-
 ### 本地運行
 
 ```bash
